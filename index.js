@@ -25,14 +25,14 @@ const connectDB = async () => {
 };
 
 // Use helmet to set security headers
-// app.use(
-//   helmet.contentSecurityPolicy({
-//     directives: {
-//       defaultSrc: ["'self'"],
-//       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-//     },
-//   })
-// );
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+    },
+  })
+);
 app.use(helmet.xssFilter());
 app.use(helmet.frameguard());
 app.use(helmet.hsts());
@@ -55,6 +55,13 @@ app.use("/", (req, res, next) => {
 
 app.use("/api", require("./routes/linkRoutes"));
 
+// Connect to the database before listening
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server up and running on port ${PORT}`);
+  });
+});
+
 // app.use(express.static("app"));
 
 // if (process.env.NODE_ENV === "production") {
@@ -62,10 +69,3 @@ app.use("/api", require("./routes/linkRoutes"));
 //     res.sendFile(path.join(__dirname, "app", "index.html"));
 //   });
 // }
-
-// Connect to the database before listening
-connectDB().then(() => {
-  app.listen(PORT, () => {
-    console.log(`Server up and running on port ${PORT}`);
-  });
-});
