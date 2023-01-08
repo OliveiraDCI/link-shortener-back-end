@@ -55,13 +55,13 @@ app.use("/", (req, res, next) => {
 
 app.use("/api", require("./routes/linkRoutes"));
 
-app.use(express.static("app"));
+// app.use(express.static("app"));
 
-if (process.env.NODE_ENV === "production") {
-  app.get("*", (_, res) => {
-    res.sendFile(path.join(__dirname, "app", "index.html"));
-  });
-}
+// if (process.env.NODE_ENV === "production") {
+//   app.get("*", (_, res) => {
+//     res.sendFile(path.join(__dirname, "app", "index.html"));
+//   });
+// }
 
 // Connect to the database before listening
 connectDB().then(() => {
