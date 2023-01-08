@@ -25,14 +25,14 @@ const connectDB = async () => {
 };
 
 // Use helmet to set security headers
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-    },
-  })
-);
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+//     },
+//   })
+// );
 app.use(helmet.xssFilter());
 app.use(helmet.frameguard());
 app.use(helmet.hsts());
