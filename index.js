@@ -53,7 +53,7 @@ app.use("/", (req, res, next) => {
   next();
 });
 
-app.use("/api", require("../api/links/routes/linkRoutes"));
+app.use("/api", require("./routes/linkRoutes"));
 
 app.use(express.static("app"));
 

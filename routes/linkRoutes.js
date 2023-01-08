@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-console.log("linkRoutes connection requested");
-
 const linkController = require("../controllers/linkController");
 
 router.get("/list", linkController.list);

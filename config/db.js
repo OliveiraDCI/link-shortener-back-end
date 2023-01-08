@@ -1,8 +1,6 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-console.log("config db connection requested");
-
 const URI = process.env.DB_URI;
 
 module.exports = async () => {
@@ -12,7 +10,6 @@ module.exports = async () => {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log("MongoDB connected - linkModel");
   } catch (error) {
     console.log("Error on DB connect: ", error.message);
 
