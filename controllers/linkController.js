@@ -79,7 +79,10 @@ module.exports.redirectLink = async (req, res) => {
     shortUrl.clicks++;
     shortUrl.save();
 
-    res.status(200).send({ redirectUrl: shortUrl.originalUrl });
+    const docObj = shortUrl.toObject();
+    console.log("docObj from redirectLink in server controller -> ", docObj);
+
+    res.send({ redirectUrl: docObj.originalUrl });
   } catch (err) {
     console.log("Error on shortLink redirecting: ", err.message);
     res.status(500).send({ success: false, error: err.message });
