@@ -1,10 +1,6 @@
 const Link = require("../models/Link");
+const isUrl = require("valid-url").isWebUri;
 const axios = require("axios");
-const { promisify } = require("util");
-const dns = require("dns");
-// const isUrl = require("valid-url").isWebUri;
-
-const dnsLookup = promisify(dns.lookup);
 
 module.exports.list = async (req, res) => {
   try {
@@ -26,31 +22,15 @@ module.exports.list = async (req, res) => {
 //     console.log("incomingLink -> ", incomingLink);
 
 //     if (isUrl(incomingLink, { require_host: true })) {
-//       // const response = await axios.get(incomingLink);
-//       const response = await axios.get(incomingLink, { validateStatus: () => true });
-
+//       const response = await axios.get(incomingLink);
 //       if (response.status >= 200 && response.status < 300) {
-//         console.log("URL is valid and reachable, checking DNS...");
-
-//         const { address, family } = await dnsLookup(incomingLink);
-
-//         console.log(
-//           "DNS lookup returns ok --> ",
-//           "Address: %j -->",
-//           address,
-//           "family: IPv%s -->",
-//           family
-//         );
-
+//         console.log("URL is valid and reachable");
 //         res.send({ success: true });
 //       } else {
 //         console.log("URL validation - link is not valid or reachable");
-
 //         res.send({ success: false });
 //       }
 //     } else {
-//       console.log("URL validation - link is not valid or reachable");
-
 //       res.send({ success: false });
 //     }
 //   } catch (err) {
@@ -61,39 +41,21 @@ module.exports.list = async (req, res) => {
 
 module.exports.validate = async (req, res) => {
   try {
-    const incomingLink = req.body.incomingLink;
+    let incomingLink = req.body.incomingLink;
+    console.log("incomingLink -> ", incomingLink);
 
-    if (!incomingLink) {
-      return res
-        .status(400)
-        .send({ success: false, error: "incomingLink is required" });
-    }
-
-    const response = await axios.get(incomingLink, {
-      validateStatus: () => true,
-    });
-
-    if (response.status < 200 || response.status >= 300) {
-      return res
-        .status(400)
-        .send({ success: false, error: "invalid url or not reachable" });
-    }
-
-    const { address, family } = await dnsLookup(incomingLink);
-
-    console.log(
-      "DNS lookup returns ok --> ",
-      "Address: %j -->",
-      address,
-      "family: IPv%s -->",
-      family
-    );
-
-    res.send({ success: true });
+    isUrl(incomingLink, { require_host: true })
+      ? (async () => {
+          const response = await axios.get(incomingLink);
+          response.status >= 200 && response.status < 300
+            ? res.send({ success: true })
+            : res.send({ success: false });
+        })()
+      : res.send({ success: false });
   } catch (err) {
     console.log("Error on link validation: ", err.message);
 
-    res.status(400).send({ success: false, error: "Error on link validation" });
+    res.send({ success: false });
   }
 };
 
