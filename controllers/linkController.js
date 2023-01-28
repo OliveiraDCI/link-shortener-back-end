@@ -3,6 +3,18 @@ const isUrl = require("valid-url").isWebUri;
 const axios = require("axios");
 const dns = require("dns");
 
+const dnsLookupPromise = (incomingLink) => {
+  return new Promise((resolve, reject) => {
+    dns.lookup(incomingLink, (err, address, family) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ address, family });
+      }
+    });
+  });
+};
+
 module.exports.list = async (req, res) => {
   try {
     const links = await Link.find();
@@ -28,28 +40,23 @@ module.exports.validate = async (req, res) => {
       if (response.status >= 200 && response.status < 300) {
         console.log("URL is valid and reachable, checking DNS...");
 
-        dns.lookup(incomingLink, (err, address, family) => {
-          if (err) {
-            console.log("Error on DNS lookup: ", err.message);
-
-            res.send({ success: false });
-          } else {
-            console.log(
-              "DNS lookup returns ok --> ",
-              "Address: %j -->",
-              address,
-              "family: IPv%s -->",
-              family
-            );
-
-            res.send({ success: true });
-          }
-        });
+        const dnsLookupResult = await dnsLookupPromise(incomingLink);
+        console.log(
+          "DNS lookup returns ok --> ",
+          "Address: %j -->",
+          dnsLookupResult.address,
+          "family: IPv%s -->",
+          dnsLookupResult.family
+        );
+        res.send({ success: true });
       } else {
         console.log("URL validation - link is not valid or reachable");
+
         res.send({ success: false });
       }
     } else {
+      console.log("URL validation - link is not valid or reachable");
+
       res.send({ success: false });
     }
   } catch (err) {
