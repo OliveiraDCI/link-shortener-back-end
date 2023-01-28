@@ -43,30 +43,24 @@ module.exports.validate = async (req, res) => {
     let incomingLink = req.body.incomingLink;
     console.log("incomingLink -> ", incomingLink);
 
-    // Perform DNS lookup
+    if (isUrl(incomingLink, { require_host: true })) {
+      const { address } = await new Promise((resolve, reject) => {
+        dns.lookup(new URL(incomingLink).hostname, (err, address, family) => {
+          if (err) reject(err);
+          else resolve({ address, family });
+        });
+      });
+      console.log(address);
 
-    const { hostname } = new URL(incomingLink);
-    await dns.promises.lookup(hostname, (err, address, family) => {
-      if (err) {
-        console.log("Error on DNS lookup:", err.message);
-
-        res.send({ success: false });
-        return;
-      }
-
-      // Check if URL is valid and reachable
-      isUrl(incomingLink, { require_host: true })
-        ? (async () => {
-            const response = await axios.get(incomingLink);
-            response.status >= 200 && response.status < 300
-              ? res.send({ success: true })
-              : res.send({ success: false });
-          })()
+      const response = await axios.get(incomingLink);
+      response.status >= 200 && response.status < 300
+        ? res.send({ success: true })
         : res.send({ success: false });
-    });
+    } else {
+      res.send({ success: false });
+    }
   } catch (err) {
-    console.log("Error on link validation: ", err.message);
-
+    console.log("Error: ", err.message);
     res.send({ success: false });
   }
 };
