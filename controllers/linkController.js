@@ -1,5 +1,5 @@
 const Link = require("../models/Link");
-const urlRegex = require("url-regex");
+const isUrl = require("valid-url").isWebUri;
 const axios = require("axios");
 
 module.exports.list = async (req, res) => {
@@ -21,10 +21,7 @@ module.exports.validate = async (req, res) => {
     let incomingLink = req.body.incomingLink;
     console.log("incomingLink -> ", incomingLink);
 
-    let regex = urlRegex({ exact: true, strict: false });
-    regex = new RegExp(regex.source, "s");
-
-    if (regex.test(incomingLink)) {
+    if (isUrl(incomingLink, { require_host: true })) {
       const response = await axios.get(incomingLink);
       if (response.status >= 200 && response.status < 300) {
         console.log("URL is valid and reachable");
