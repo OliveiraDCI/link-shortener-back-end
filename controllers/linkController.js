@@ -2,6 +2,7 @@ const Link = require("../models/Link");
 const isUrl = require("valid-url").isWebUri;
 const axios = require("axios");
 const dns = require("dns");
+const url = require("url");
 
 module.exports.list = async (req, res) => {
   try {
@@ -43,9 +44,12 @@ module.exports.validate = async (req, res) => {
     console.log("incomingLink -> ", incomingLink);
 
     // Perform DNS lookup
-    dns.lookup(incomingLink, (err, address, family) => {
+
+    const { hostname } = new URL(incomingLink);
+    await dns.promises.lookup(hostname, (err, address, family) => {
       if (err) {
         console.log("Error on DNS lookup:", err.message);
+
         res.send({ success: false });
         return;
       }
