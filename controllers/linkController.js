@@ -2,18 +2,9 @@ const Link = require("../models/Link");
 const isUrl = require("valid-url").isWebUri;
 const axios = require("axios");
 const dns = require("dns");
+const { promisify } = require("util");
 
-const dnsLookupPromise = (incomingLink) => {
-  return new Promise((resolve, reject) => {
-    dns.lookup(incomingLink, (err, address, family) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ address, family });
-      }
-    });
-  });
-};
+const dnsLookup = promisify(dns.lookup);
 
 module.exports.list = async (req, res) => {
   try {
@@ -40,14 +31,16 @@ module.exports.validate = async (req, res) => {
       if (response.status >= 200 && response.status < 300) {
         console.log("URL is valid and reachable, checking DNS...");
 
-        const dnsLookupResult = await dnsLookupPromise(incomingLink);
+        const { address, family } = await dnsLookup(incomingLink);
+
         console.log(
           "DNS lookup returns ok --> ",
           "Address: %j -->",
-          dnsLookupResult.address,
+          address,
           "family: IPv%s -->",
-          dnsLookupResult.family
+          family
         );
+
         res.send({ success: true });
       } else {
         console.log("URL validation - link is not valid or reachable");
