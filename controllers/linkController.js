@@ -8,7 +8,6 @@ module.exports.list = async (req, res) => {
 
     if (!links) return res.send({ success: false, errorId: 1 });
 
-    // console.log("list handler - sending true: links -> ", links);
     res.send({ success: true, links: links });
   } catch (err) {
     console.log("Error on linkController.list: ", err.message);
