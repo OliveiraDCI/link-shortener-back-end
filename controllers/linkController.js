@@ -18,26 +18,6 @@ module.exports.list = async (req, res) => {
   }
 };
 
-// module.exports.validate = async (req, res) => {
-//   try {
-//     let incomingLink = req.body.incomingLink;
-//     console.log("incomingLink -> ", incomingLink);
-
-//     isUrl(incomingLink, { require_host: true })
-//       ? (async () => {
-//           const response = await axios.get(incomingLink);
-//           response.status >= 200 && response.status < 300
-//             ? res.send({ success: true })
-//             : res.send({ success: false });
-//         })()
-//       : res.send({ success: false });
-//   } catch (err) {
-//     console.log("Error on link validation: ", err.message);
-
-//     res.send({ success: false });
-//   }
-// };
-
 module.exports.validate = async (req, res) => {
   try {
     let incomingLink = req.body.incomingLink;
